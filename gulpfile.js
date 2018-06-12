@@ -17,7 +17,7 @@ var banner = ['/*!\n',
 ].join('');
 
 // Copy third party libraries from /node_modules into /vendor
-gulp.task('vendor', function() {
+gulp.task('vendor', function(done) {
 
   // Bootstrap
   gulp.src([
@@ -60,7 +60,7 @@ gulp.task('vendor', function() {
       './node_modules/simple-line-icons/css/**',
     ])
     .pipe(gulp.dest('./vendor/simple-line-icons/css'))
-
+    done();
 });
 
 // Compile SCSS
@@ -73,7 +73,7 @@ gulp.task('css:compile', function() {
 });
 
 // Minify CSS
-gulp.task('css:minify', ['css:compile'], function() {
+gulp.task('css:minify', gulp.series(['css:compile']), function() {
   return gulp.src([
       './css/*.css',
       '!./css/*.min.css'
@@ -87,7 +87,7 @@ gulp.task('css:minify', ['css:compile'], function() {
 });
 
 // CSS
-gulp.task('css', ['css:compile', 'css:minify']);
+gulp.task('css', gulp.series(['css:compile', 'css:minify']));
 
 // Minify JavaScript
 gulp.task('js:minify', function() {
@@ -104,10 +104,10 @@ gulp.task('js:minify', function() {
 });
 
 // JS
-gulp.task('js', ['js:minify']);
+gulp.task('js', gulp.series(['js:minify']));
 
 // Default task
-gulp.task('default', ['css', 'js', 'vendor']);
+gulp.task('default', gulp.series(['css', 'js', 'vendor']));
 
 // Configure the browserSync task
 gulp.task('browserSync', function() {
@@ -119,7 +119,7 @@ gulp.task('browserSync', function() {
 });
 
 // Dev task
-gulp.task('dev', ['css', 'js', 'browserSync'], function() {
+gulp.task('dev', gulp.series(['css', 'js', 'browserSync']), function() {
   gulp.watch('./scss/*.scss', ['css']);
   gulp.watch('./js/*.js', ['js']);
   gulp.watch('./*.html', browserSync.reload);
